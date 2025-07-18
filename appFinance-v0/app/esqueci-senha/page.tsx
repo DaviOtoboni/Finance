@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState("");
@@ -30,19 +31,26 @@ export default function EsqueciSenhaPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10 space-y-4">
-      <input
-        type="email"
-        placeholder="Seu email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="input"
-      />
-      {error && <div className="text-red-500">{error}</div>}
-      {message && <div className="text-green-500">{message}</div>}
-      <button type="submit" className="btn" disabled={loading}>
-        {loading ? "Enviando..." : "Enviar email de recuperação"}
-      </button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-full max-w-md space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Seu email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input bg-blue-50"
+          />
+          {error && <div className="text-red-500 text-center">{error}</div>}
+          {message && <div className="text-green-500 text-center">{message}</div>}
+          <button type="submit" className="btn" disabled={loading}>
+            {loading ? "Enviando..." : "Enviar email de recuperação"}
+          </button>
+        </form>
+        <div className="flex flex-col items-center space-y-2 text-sm text-blue-700">
+          <Link href="/alterar-senha" className="hover:underline">Alterar senha</Link>
+        </div>
+      </div>
+    </div>
   );
 } 

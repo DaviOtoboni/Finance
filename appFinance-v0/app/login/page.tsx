@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -40,27 +41,36 @@ export default function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10 space-y-4">
-      <input
-        name="email"
-        type="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={handleChange}
-        className="input"
-      />
-      <input
-        name="password"
-        type="password"
-        placeholder="Senha"
-        value={form.password}
-        onChange={handleChange}
-        className="input"
-      />
-      {error && <div className="text-red-500">{error}</div>}
-      <button type="submit" className="btn" disabled={loading}>
-        {loading ? "Entrando..." : "Entrar"}
-      </button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-full max-w-md space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            className="input bg-blue-50"
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Senha"
+            value={form.password}
+            onChange={handleChange}
+            className="input bg-blue-50"
+          />
+          {error && <div className="text-red-500 text-center">{error}</div>}
+          <button type="submit" className="btn" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+        <div className="flex flex-col items-center space-y-2 text-sm text-blue-700">
+          <Link href="/signup" className="hover:underline">Criar nova conta</Link>
+          <Link href="/esqueci-senha" className="hover:underline">Esqueci minha senha</Link>
+          <Link href="/alterar-senha" className="hover:underline">Alterar senha</Link>
+        </div>
+      </div>
+    </div>
   );
 } 
