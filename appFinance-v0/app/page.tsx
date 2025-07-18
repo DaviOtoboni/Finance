@@ -57,9 +57,15 @@ export default function HomePage() {
           <p className="text-xl text-gray-600 mb-8">
             Organize seus gastos, defina limites e acompanhe suas finanças em tempo real
           </p>
+          {/*
           <Button onClick={handleGoogleSignIn} disabled={loading} size="lg" className="bg-blue-600 hover:bg-blue-700">
             {loading ? "Entrando..." : "Entrar com Google"}
           </Button>
+          */}
+          <div className="flex flex-col items-center space-y-2 mt-4">
+            <a href="/login" className="btn w-48 text-center">Entrar com Email</a>
+            <a href="/signup" className="btn w-48 text-center bg-gray-200 text-blue-700 hover:bg-gray-300">Criar Conta</a>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
