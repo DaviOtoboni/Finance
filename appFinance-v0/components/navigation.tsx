@@ -20,7 +20,7 @@ export function Navigation() {
 
   const handleSignOut = async () => {
     await signOut()
-    window.location.href = "/"
+    window.location.href = "/login"
   }
 
   return (
