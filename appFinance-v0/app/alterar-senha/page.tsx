@@ -40,15 +40,15 @@ export default function AlterarSenhaPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
       <div className="w-full max-w-md space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-card p-8 rounded shadow">
           <input
             type="password"
             placeholder="Nova senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="input bg-blue-50"
+            className="input bg-blue-50 dark:bg-zinc-900 dark:text-foreground"
           />
           {error && <div className="text-red-500 text-center">{error}</div>}
           {success && <div className="text-green-500 text-center">{success}</div>}
@@ -56,7 +56,7 @@ export default function AlterarSenhaPage() {
             {loading ? "Alterando..." : "Alterar senha"}
           </button>
         </form>
-        <div className="flex flex-col items-center space-y-2 text-sm text-blue-700">
+        <div className="flex flex-col items-center space-y-2 text-sm text-blue-700 dark:text-blue-300">
           <Link href="/login" className="hover:underline">Voltar para o login</Link>
         </div>
       </div>

@@ -60,15 +60,15 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
       <div className="w-full max-w-md space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-card p-8 rounded shadow">
           <input
             name="username"
             placeholder="Nome de usuário"
             value={form.username}
             onChange={handleChange}
-            className="input bg-blue-50"
+            className="input bg-blue-50 dark:bg-zinc-900 dark:text-foreground"
           />
           <input
             name="email"
@@ -76,7 +76,7 @@ export default function SignUpPage() {
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            className="input bg-blue-50"
+            className="input bg-blue-50 dark:bg-zinc-900 dark:text-foreground"
           />
           <input
             name="password"
@@ -84,14 +84,14 @@ export default function SignUpPage() {
             placeholder="Senha"
             value={form.password}
             onChange={handleChange}
-            className="input bg-blue-50"
+            className="input bg-blue-50 dark:bg-zinc-900 dark:text-foreground"
           />
           {error && <div className="text-red-500 text-center">{error}</div>}
           <button type="submit" className="btn" disabled={loading}>
             {loading ? "Cadastrando..." : "Cadastrar"}
           </button>
         </form>
-        <div className="flex flex-col items-center space-y-2 text-sm text-blue-700">
+        <div className="flex flex-col items-center space-y-2 text-sm text-blue-700 dark:text-blue-300">
           <Link href="/login" className="hover:underline">Já tem conta? Entrar</Link>
           <Link href="/esqueci-senha" className="hover:underline">Esqueci minha senha</Link>
           <Link href="/alterar-senha" className="hover:underline">Alterar senha</Link>
