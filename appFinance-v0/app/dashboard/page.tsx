@@ -5,10 +5,59 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from "@/lib/supabase"
 import { AuthGuard } from "@/components/auth-guard"
 import { Navigation } from "@/components/navigation"
-import { TrendingUp, Calendar, AlertTriangle, DollarSign } from "lucide-react"
+import {
+  Car,
+  Utensils,
+  Plane,
+  Home,
+  Gamepad2,
+  Wifi,
+  DollarSign,
+  HeartPulse,
+  BookOpen,
+  Star
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import CategoryAlert from '@/components/CategoryAlert';
 import ExpenseCard from '@/components/ExpenseCard';
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+
+const defaultColors = [
+  "#3B82F6",
+  "#EF4444",
+  "#10B981",
+  "#F59E0B",
+  "#8B5CF6",
+  "#EC4899",
+  "#06B6D4",
+  "#84CC16",
+  "#F97316",
+  "#6366F1",
+]
+
+const categoryIcons = [
+  { name: "carro", icon: Car },
+  { name: "comida", icon: Utensils },
+  { name: "viagem", icon: Plane },
+  { name: "lazer", icon: Home },
+  { name: "jogos", icon: Gamepad2 },
+  { name: "internet", icon: Wifi },
+  { name: "dinheiro", icon: DollarSign },
+  { name: "saude", icon: HeartPulse },
+  { name: "educacao", icon: BookOpen },
+  { name: "outros", icon: Star },
+]
 
 interface DashboardData {
   totalMonth: number
@@ -37,6 +86,58 @@ export default function DashboardPage() {
     recentExpenses: [],
   })
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [loadingCategory, setLoadingCategory] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    limit_amount: "",
+    icon: categoryIcons[0].name,
+  });
+
+  const openNewDialog = () => {
+    setFormData({ name: "", limit_amount: "", icon: categoryIcons[0].name });
+    setDialogOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name) {
+      toast({
+        title: "Erro",
+        description: "Nome da categoria é obrigatório",
+        variant: "destructive",
+      });
+      return;
+    }
+    setLoadingCategory(true);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase.from("categories").insert({
+        user_id: user.id,
+        name: formData.name,
+        limit_amount: Number.parseFloat(formData.limit_amount) || 0,
+        icon: formData.icon,
+      });
+      if (error) throw error;
+      toast({ title: "Sucesso", description: "Categoria criada!" });
+      setDialogOpen(false);
+      setFormData({ name: "", limit_amount: "", icon: categoryIcons[0].name });
+      loadDashboardData();
+    } catch (error) {
+      console.error("Erro ao salvar categoria:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar a categoria",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingCategory(false);
+    }
+  };
 
   useEffect(() => {
     loadDashboardData()
@@ -143,71 +244,100 @@ export default function DashboardPage() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background text-foreground">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-            {/* Cartões de resumo de despesas por categoria */}
-            {data.recentExpenses.map((expense) => (
-              <ExpenseCard
-                key={expense.id}
-                title={expense.category}
-                amount={expense.amount}
-                icon="ri-wallet-3-line"
-                color="bg-blue-500"
-              />
-            ))}
+          <div className="flex justify-between items-center mb-8">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openNewDialog}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nova Categoria
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Nova Categoria</DialogTitle>
+                  <DialogDescription>
+                    Crie uma nova categoria para organizar seus gastos
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nome *</Label>
+                    <Input
+                      id="name"
+                      placeholder="Ex: Alimentação, Transporte..."
+                      value={formData.name}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="limit">Limite Mensal (R$)</Label>
+                    <Input
+                      id="limit"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0,00"
+                      value={formData.limit_amount}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, limit_amount: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Ícone</Label>
+                    <div className="flex gap-2 flex-wrap">
+                      {categoryIcons.map(({ name, icon: Icon }) => (
+                        <button
+                          key={name}
+                          type="button"
+                          className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-colors ${
+                            formData.icon === name ? "border-gray-900 bg-muted" : "border-gray-300 bg-background"
+                          }`}
+                          onClick={() => setFormData((prev) => ({ ...prev, icon: name }))}
+                          aria-label={name}
+                        >
+                          <Icon className="h-6 w-6" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Button type="submit" disabled={loadingCategory} className="w-full">
+                    {loadingCategory ? "Salvando..." : "Criar"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
-
+          {/* Removido grid de cartões de resumo de despesas por categoria */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Alertas visuais de categorias acima do limite */}
             {data.categoriesOverLimit.length > 0 && (
-              <Card>
-                <CardHeader>
-                  {/* Removido CardTitle e CardDescription */}
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {data.categoriesOverLimit.map((category, index) => (
-                      <CategoryAlert
-                        key={index}
-                        category={category.name}
-                        spent={category.spent}
-                        limit={category.limit}
-                        isExceeded={category.spent > category.limit}
-                      />
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card>
-              <CardHeader>
-                {/* Removido CardTitle e CardDescription */}
-              </CardHeader>
-              <CardContent>
+              <div className="bg-card text-foreground rounded-xl p-6">
                 <div className="space-y-3">
-                  {data.recentExpenses.map((expense) => (
-                    <div key={expense.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: expense.categoryColor }} />
-                        <div>
-                          <div className="font-medium">{expense.description}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {expense.category} • {new Date(expense.date).toLocaleDateString("pt-BR")}
-                          </div>
-                        </div>
-                      </div>
-                      <Badge variant="secondary">{formatCurrency(expense.amount)}</Badge>
-                    </div>
+                  {data.categoriesOverLimit.map((category, index) => (
+                    <CategoryAlert
+                      key={index}
+                      category={category.name}
+                      spent={category.spent}
+                      limit={category.limit}
+                      isExceeded={category.spent > category.limit}
+                    />
                   ))}
-                  {data.recentExpenses.length === 0 && (
-                    <div className="text-center text-muted-foreground py-8">Nenhum gasto registrado ainda</div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            )}
+            <div className="bg-card text-foreground rounded-xl p-6">
+              {/* Gastos recentes */}
+              {data.recentExpenses.map((exp, idx) => (
+                <div key={exp.id} className="mb-2 last:mb-0 bg-muted rounded p-2 flex items-center justify-between">
+                  <span className="text-sm text-foreground">
+                    {exp.category} • {exp.date}
+                  </span>
+                  <span className="font-semibold text-foreground">{formatCurrency(exp.amount)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
