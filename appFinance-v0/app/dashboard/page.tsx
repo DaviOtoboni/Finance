@@ -324,7 +324,7 @@ export default function DashboardPage() {
           {/* Grid principal com containers organizados */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Container das Categorias - Lado Esquerdo */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <div className="bg-neutral-100 dark:bg-neutral-900 border border-border rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
                 <h2 className="text-lg font-semibold text-foreground">Suas Categorias</h2>
                 <div className="flex gap-2">
@@ -501,7 +501,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Container dos Gastos Recentes - Lado Direito */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <div className="bg-neutral-100 dark:bg-neutral-900 border border-border rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-foreground mb-0">Gastos Recentes</h2>
                 {/* The DialogTrigger for expenseDialogOpen is now inside the categories header */}
