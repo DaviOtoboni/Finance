@@ -101,3 +101,14 @@ body {
 .btn {
   @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition w-full;
 }
+
+.nav-container {
+  max-width: 1000px; /* ajuste para o mesmo valor do container do body, se necessário */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  box-sizing: border-box;
+  /* Remova ou ajuste o valor de max-width conforme o .container do Tailwind */
+}
