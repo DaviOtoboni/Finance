@@ -518,7 +518,83 @@ export default function DashboardPage() {
             <div className="bg-neutral-100 dark:bg-neutral-900 border border-border rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-foreground mb-0">Gastos Recentes</h2>
-                {/* The DialogTrigger for expenseDialogOpen is now inside the categories header */}
+                <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button onClick={openExpenseDialog} size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Gasto
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Adicionar Novo Gasto</DialogTitle>
+                      <DialogDescription>Registre um novo gasto em uma categoria específica</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleExpenseSubmit} className="space-y-6">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="category">Categoria *</Label>
+                          <Select
+                            value={expenseForm.categoryId}
+                            onValueChange={(value) => setExpenseForm((prev) => ({ ...prev, categoryId: value }))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma categoria" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {data.categories.map((category) => {
+                                const IconComponent = categoryIcons.find(ci => ci.name === category.icon)?.icon || Star;
+                                return (
+                                  <SelectItem key={category.id} value={category.id}>
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-3 h-3 rounded-full bg-primary/30 flex items-center justify-center">
+                                        <IconComponent className="h-3 w-3" />
+                                      </span>
+                                      {category.name}
+                                    </div>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="amount">Valor (R$) *</Label>
+                          <Input
+                            id="amount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0,00"
+                            value={expenseForm.amount}
+                            onChange={(e) => setExpenseForm((prev) => ({ ...prev, amount: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="date">Data</Label>
+                        <Input
+                          id="date"
+                          type="date"
+                          value={expenseForm.date}
+                          onChange={(e) => setExpenseForm((prev) => ({ ...prev, date: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Descrição</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Descreva o gasto (opcional)"
+                          value={expenseForm.description}
+                          onChange={(e) => setExpenseForm((prev) => ({ ...prev, description: e.target.value }))}
+                        />
+                      </div>
+                      <Button type="submit" disabled={expenseLoading} className="w-full">
+                        {expenseLoading ? "Adicionando..." : "Adicionar Gasto"}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
               
               {data.recentExpenses.length === 0 ? (
