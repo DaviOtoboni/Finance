@@ -113,6 +113,9 @@ export default function DashboardPage() {
     description: "",
     date: new Date().toISOString().split("T")[0],
   });
+  // Remover o filtro de gastos recentes para cálculo do spent por categoria
+  // Adicionar estado para todos os gastos do mês
+  const [allMonthExpenses, setAllMonthExpenses] = useState([]);
 
   const openNewDialog = () => {
     setFormData({ name: "", limit_amount: "", icon: categoryIcons[0].name });
@@ -219,17 +222,12 @@ export default function DashboardPage() {
       // Total do mês
       const { data: monthlyExpenses } = await supabase
         .from("expenses")
-        .select("amount")
+        .select("*") // buscar todos os campos para uso posterior
         .eq("user_id", user.id)
         .gte("date", `${currentYear}-${currentMonth.toString().padStart(2, "0")}-01`)
         .lt("date", `${currentYear}-${(currentMonth + 1).toString().padStart(2, "0")}-01`)
 
-      // Total do dia
-      const { data: todayExpenses } = await supabase
-        .from("expenses")
-        .select("amount")
-        .eq("user_id", user.id)
-        .eq("date", today)
+      setAllMonthExpenses(monthlyExpenses || []);
 
       // Todas as categorias do usuário
       const { data: allCategories } = await supabase
@@ -237,37 +235,7 @@ export default function DashboardPage() {
         .select("*")
         .eq("user_id", user.id)
 
-      // Categorias que ultrapassaram o limite
-      const { data: categories } = await supabase
-        .from("categories")
-        .select("*")
-        .eq("user_id", user.id)
-        .gt("limit_amount", 0)
-
-      const categoriesOverLimit = []
-      if (categories) {
-        for (const category of categories) {
-          const { data: categoryExpenses } = await supabase
-            .from("expenses")
-            .select("amount")
-            .eq("user_id", user.id)
-            .eq("category_id", category.id)
-            .gte("date", `${currentYear}-${currentMonth.toString().padStart(2, "0")}-01`)
-            .lt("date", `${currentYear}-${(currentMonth + 1).toString().padStart(2, "0")}-01`)
-
-          const spent = categoryExpenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0
-          if (spent > category.limit_amount) {
-            categoriesOverLimit.push({
-              name: category.name,
-              spent,
-              limit: category.limit_amount,
-              color: category.color,
-            })
-          }
-        }
-      }
-
-      // Gastos recentes
+      // Gastos recentes (agora sem limite)
       const { data: recentExpenses } = await supabase
         .from("expenses")
         .select(`
@@ -279,12 +247,12 @@ export default function DashboardPage() {
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(5)
+        // Remover .limit(5)
 
       setData({
         totalMonth: monthlyExpenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0,
-        totalToday: todayExpenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0,
-        categoriesOverLimit,
+        totalToday: monthlyExpenses?.filter(exp => exp.date === today).reduce((sum, exp) => sum + exp.amount, 0) || 0,
+        categoriesOverLimit: [], // não usado mais
         categories: allCategories?.map((cat) => ({
           id: cat.id,
           name: cat.name,
@@ -401,8 +369,8 @@ export default function DashboardPage() {
                 ) : (
                   data.categories.map((category) => {
                     const IconComponent = categoryIcons.find(ci => ci.name === category.icon)?.icon || Star;
-                    // Calcular gasto do mês para a categoria
-                    const categoryExpenses = data.recentExpenses.filter(exp => exp.category === category.name);
+                    // Calcular gasto do mês para a categoria usando allMonthExpenses
+                    const categoryExpenses = allMonthExpenses.filter(exp => exp.category_id === category.id);
                     const spent = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0);
                     const isExceeded = category.limit_amount > 0 && spent > category.limit_amount;
                     return (
