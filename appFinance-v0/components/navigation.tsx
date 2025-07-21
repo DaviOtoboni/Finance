@@ -26,10 +26,10 @@ export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-start">
           <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-300">
             <div
-              className="flex gap-1 md:gap-2 min-w-max px-2 md:px-0 justify-center md:justify-center"
+              className="flex gap-1 md:gap-2 min-w-max px-2 md:px-0 justify-start md:justify-start"
               style={{
                 scrollSnapType: 'x mandatory',
                 WebkitOverflowScrolling: 'touch',

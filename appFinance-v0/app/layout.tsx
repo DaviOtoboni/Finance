@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className + " transition-colors duration-500"}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <ErrorBoundary>{children}</ErrorBoundary>
         <Toaster />
