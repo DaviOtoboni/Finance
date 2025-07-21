@@ -234,7 +234,7 @@ export default function RelatoriosPage() {
 
           <div className="grid gap-6 md:grid-cols-2 mb-8">
             {/* Gráfico de Pizza - Gastos por Categoria */}
-            <Card>
+            <Card className="bg-neutral-100 dark:bg-neutral-900 border border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5" />
@@ -282,7 +282,7 @@ export default function RelatoriosPage() {
             </Card>
 
             {/* Gráfico de Barras - Gastos Diários */}
-            <Card>
+            <Card className="bg-neutral-100 dark:bg-neutral-900 border border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
@@ -324,7 +324,7 @@ export default function RelatoriosPage() {
           </div>
 
           {/* Resumo */}
-          <Card>
+          <Card className="bg-neutral-100 dark:bg-neutral-900 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />

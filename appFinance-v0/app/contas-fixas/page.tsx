@@ -276,7 +276,7 @@ export default function ContasFixasPage() {
 
           {/* Resumo */}
           <div className="grid gap-4 md:grid-cols-3 mb-8">
-            <Card>
+            <Card className="bg-neutral-100 dark:bg-neutral-900 border border-border">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total das Contas</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -286,7 +286,7 @@ export default function ContasFixasPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-neutral-100 dark:bg-neutral-900 border border-border">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pagas</CardTitle>
                 <Calendar className="h-4 w-4 text-green-600" />
@@ -296,7 +296,7 @@ export default function ContasFixasPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-neutral-100 dark:bg-neutral-900 border border-border">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
                 <Calendar className="h-4 w-4 text-orange-600" />
