@@ -33,6 +33,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 
 const defaultColors = [
   "#3B82F6",
@@ -102,6 +104,15 @@ export default function DashboardPage() {
     limit_amount: "",
     icon: categoryIcons[0].name,
   });
+  // Estado para modal de gasto
+  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  const [expenseLoading, setExpenseLoading] = useState(false);
+  const [expenseForm, setExpenseForm] = useState({
+    categoryId: "",
+    amount: "",
+    description: "",
+    date: new Date().toISOString().split("T")[0],
+  });
 
   const openNewDialog = () => {
     setFormData({ name: "", limit_amount: "", icon: categoryIcons[0].name });
@@ -144,6 +155,48 @@ export default function DashboardPage() {
       });
     } finally {
       setLoadingCategory(false);
+    }
+  };
+
+  const openExpenseDialog = () => {
+    setExpenseForm({ categoryId: "", amount: "", description: "", date: new Date().toISOString().split("T")[0] });
+    setExpenseDialogOpen(true);
+  };
+  const handleExpenseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!expenseForm.categoryId || !expenseForm.amount) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos obrigatórios",
+        variant: "destructive",
+      });
+      return;
+    }
+    setExpenseLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase.from("expenses").insert({
+        user_id: user.id,
+        category_id: expenseForm.categoryId,
+        amount: Number.parseFloat(expenseForm.amount),
+        description: expenseForm.description,
+        date: expenseForm.date,
+      });
+      if (error) throw error;
+      toast({ title: "Sucesso", description: "Gasto adicionado com sucesso!" });
+      setExpenseDialogOpen(false);
+      setExpenseForm({ categoryId: "", amount: "", description: "", date: new Date().toISOString().split("T")[0] });
+      loadDashboardData();
+    } catch (error) {
+      console.error("Erro ao adicionar gasto:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível adicionar o gasto",
+        variant: "destructive",
+      });
+    } finally {
+      setExpenseLoading(false);
     }
   };
 
@@ -272,68 +325,146 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Container das Categorias - Lado Esquerdo */}
             <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
                 <h2 className="text-lg font-semibold text-foreground">Suas Categorias</h2>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={openNewDialog} size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Nova Categoria
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Nova Categoria</DialogTitle>
-                      <DialogDescription>
-                        Crie uma nova categoria para organizar seus gastos
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Nome *</Label>
-                        <Input
-                          id="name"
-                          placeholder="Ex: Alimentação, Transporte..."
-                          value={formData.name}
-                          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="limit">Limite Mensal (R$)</Label>
-                        <Input
-                          id="limit"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="0,00"
-                          value={formData.limit_amount}
-                          onChange={(e) => setFormData((prev) => ({ ...prev, limit_amount: e.target.value }))}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Ícone</Label>
-                        <div className="flex gap-2 flex-wrap">
-                          {categoryIcons.map(({ name, icon: Icon }) => (
-                            <button
-                              key={name}
-                              type="button"
-                              className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-colors ${
-                                formData.icon === name ? "border-gray-900 bg-muted" : "border-gray-300 bg-background"
-                              }`}
-                              onClick={() => setFormData((prev) => ({ ...prev, icon: name }))}
-                              aria-label={name}
-                            >
-                              <Icon className="h-6 w-6" />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <Button type="submit" disabled={loadingCategory} className="w-full">
-                        {loadingCategory ? "Salvando..." : "Criar"}
+                <div className="flex gap-2">
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button onClick={openNewDialog} size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Nova Categoria
                       </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Nova Categoria</DialogTitle>
+                        <DialogDescription>
+                          Crie uma nova categoria para organizar seus gastos
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Nome *</Label>
+                          <Input
+                            id="name"
+                            placeholder="Ex: Alimentação, Transporte..."
+                            value={formData.name}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="limit">Limite Mensal (R$)</Label>
+                          <Input
+                            id="limit"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0,00"
+                            value={formData.limit_amount}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, limit_amount: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Ícone</Label>
+                          <div className="flex gap-2 flex-wrap">
+                            {categoryIcons.map(({ name, icon: Icon }) => (
+                              <button
+                                key={name}
+                                type="button"
+                                className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-colors ${
+                                  formData.icon === name ? "border-gray-900 bg-muted" : "border-gray-300 bg-background"
+                                }`}
+                                onClick={() => setFormData((prev) => ({ ...prev, icon: name }))}
+                                aria-label={name}
+                              >
+                                <Icon className="h-6 w-6" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button type="submit" disabled={loadingCategory} className="w-full">
+                          {loadingCategory ? "Salvando..." : "Criar"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button onClick={openExpenseDialog} size="sm" variant="secondary">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Gasto
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Adicionar Novo Gasto</DialogTitle>
+                        <DialogDescription>Registre um novo gasto em uma categoria específica</DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleExpenseSubmit} className="space-y-6">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="category">Categoria *</Label>
+                            <Select
+                              value={expenseForm.categoryId}
+                              onValueChange={(value) => setExpenseForm((prev) => ({ ...prev, categoryId: value }))}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione uma categoria" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {data.categories.map((category) => (
+                                  <SelectItem key={category.id} value={category.id}>
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-3 h-3 rounded-full bg-primary/30 flex items-center justify-center">
+                                        {categoryIcons.find(ci => ci.name === category.icon)?.icon ? (
+                                          <span className="inline-block"><(categoryIcons.find(ci => ci.name === category.icon)?.icon || Star) className='h-3 w-3' /></span>
+                                        ) : null}
+                                      </span>
+                                      {category.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="amount">Valor (R$) *</Label>
+                            <Input
+                              id="amount"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder="0,00"
+                              value={expenseForm.amount}
+                              onChange={(e) => setExpenseForm((prev) => ({ ...prev, amount: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="date">Data</Label>
+                          <Input
+                            id="date"
+                            type="date"
+                            value={expenseForm.date}
+                            onChange={(e) => setExpenseForm((prev) => ({ ...prev, date: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="description">Descrição</Label>
+                          <Textarea
+                            id="description"
+                            placeholder="Descreva o gasto (opcional)"
+                            value={expenseForm.description}
+                            onChange={(e) => setExpenseForm((prev) => ({ ...prev, description: e.target.value }))}
+                          />
+                        </div>
+                        <Button type="submit" disabled={expenseLoading} className="w-full">
+                          {expenseLoading ? "Adicionando..." : "Adicionar Gasto"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
               
               {/* Lista de Categorias */}
