@@ -478,8 +478,12 @@ export default function DashboardPage() {
                 ) : (
                   data.categories.map((category) => {
                     const IconComponent = categoryIcons.find(ci => ci.name === category.icon)?.icon || Star;
+                    // Calcular gasto do mês para a categoria
+                    const categoryExpenses = data.recentExpenses.filter(exp => exp.category === category.name);
+                    const spent = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+                    const isExceeded = category.limit_amount > 0 && spent > category.limit_amount;
                     return (
-                      <div key={category.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50">
+                      <div key={category.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50 gap-4">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full">
                             <IconComponent className="h-4 w-4 text-primary" />
@@ -493,6 +497,16 @@ export default function DashboardPage() {
                             )}
                           </div>
                         </div>
+                        {isExceeded && (
+                          <div className="w-60 max-w-xs">
+                            <CategoryAlert
+                              category={category.name}
+                              spent={spent}
+                              limit={category.limit_amount}
+                              isExceeded={isExceeded}
+                            />
+                          </div>
+                        )}
                       </div>
                     );
                   })
@@ -532,24 +546,6 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
-
-          {/* Alertas de categorias acima do limite */}
-            {data.categoriesOverLimit.length > 0 && (
-            <div className="mt-6 bg-card border border-border rounded-xl p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-foreground mb-4">⚠️ Alertas de Limite</h2>
-                  <div className="space-y-3">
-                    {data.categoriesOverLimit.map((category, index) => (
-                      <CategoryAlert
-                        key={index}
-                        category={category.name}
-                        spent={category.spent}
-                        limit={category.limit}
-                        isExceeded={category.spent > category.limit}
-                      />
-                    ))}
-                  </div>
-                    </div>
-                  )}
         </div>
       </div>
     </AuthGuard>
