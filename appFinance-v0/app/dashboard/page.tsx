@@ -360,7 +360,7 @@ export default function DashboardPage() {
               </div>
               
               {/* Lista de Categorias */}
-              <div className="space-y-3">
+              <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-neutral-400 scrollbar-track-neutral-200 pr-2">
                 {data.categories.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <p>Nenhuma categoria criada ainda.</p>
@@ -488,29 +488,31 @@ export default function DashboardPage() {
                 </Dialog>
               </div>
               
-              {data.recentExpenses.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>Nenhum gasto registrado ainda.</p>
-                  <p className="text-sm">Adicione gastos para ver aqui!</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {data.recentExpenses.map((exp) => (
-                    <div key={exp.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full">
-                          <DollarSign className="h-4 w-4 text-primary" />
+              <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-neutral-400 scrollbar-track-neutral-200 pr-2">
+                {data.recentExpenses.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Nenhum gasto registrado ainda.</p>
+                    <p className="text-sm">Adicione gastos para ver aqui!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {data.recentExpenses.map((exp) => (
+                      <div key={exp.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full">
+                            <DollarSign className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{exp.category}</p>
+                            <p className="text-sm text-muted-foreground">{exp.date}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-foreground">{exp.category}</p>
-                          <p className="text-sm text-muted-foreground">{exp.date}</p>
-                        </div>
+                        <span className="font-semibold text-foreground">{formatCurrency(exp.amount)}</span>
                       </div>
-                      <span className="font-semibold text-foreground">{formatCurrency(exp.amount)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
