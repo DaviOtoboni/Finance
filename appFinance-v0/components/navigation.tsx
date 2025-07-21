@@ -10,7 +10,6 @@ import { useTheme } from "next-themes"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/adicionar-gasto", label: "Adicionar Gasto" },
   { href: "/contas-fixas", label: "Contas Fixas" },
   { href: "/relatorios", label: "Relatórios" },
 ]
