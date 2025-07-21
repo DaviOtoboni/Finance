@@ -26,33 +26,23 @@ export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between px-4">
-        <div className="flex items-center">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-300">
-            <div
-              className="flex gap-1 md:gap-2 min-w-max"
-              style={{
-                scrollSnapType: 'x mandatory',
-                WebkitOverflowScrolling: 'touch',
-              }}
-            >
-              {navItems.map((item) => (
-                <Link key={item.href} href={item.href} style={{ scrollSnapAlign: 'center' }}>
-                  <Button
-                    variant={pathname === item.href ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "whitespace-nowrap text-sm font-medium transition-colors",
-                      pathname === item.href
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {item.label}
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <div className="flex items-center gap-1 md:gap-2 min-w-max">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} style={{ scrollSnapAlign: 'center' }}>
+              <Button
+                variant={pathname === item.href ? "default" : "ghost"}
+                size="sm"
+                className={cn(
+                  "whitespace-nowrap text-sm font-medium transition-colors",
+                  pathname === item.href
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {item.label}
+              </Button>
+            </Link>
+          ))}
         </div>
         <div className="flex items-center gap-2">
           <Button
