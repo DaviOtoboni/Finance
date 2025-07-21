@@ -267,11 +267,8 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-background text-foreground">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Gerencie suas categorias e acompanhe seus gastos</p>
-          </div>
-                    {/* Grid principal com containers organizados */}
+          {/* Removido título e subtítulo */}
+          {/* Grid principal com containers organizados */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Container das Categorias - Lado Esquerdo */}
             <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
