@@ -412,18 +412,19 @@ export default function DashboardPage() {
                                 <SelectValue placeholder="Selecione uma categoria" />
                               </SelectTrigger>
                               <SelectContent>
-                                {data.categories.map((category) => (
-                                  <SelectItem key={category.id} value={category.id}>
-                                    <div className="flex items-center gap-2">
-                                      <span className="w-3 h-3 rounded-full bg-primary/30 flex items-center justify-center">
-                                        {categoryIcons.find(ci => ci.name === category.icon)?.icon ? (
-                                          <span className="inline-block"><(categoryIcons.find(ci => ci.name === category.icon)?.icon || Star) className='h-3 w-3' /></span>
-                                        ) : null}
-                                      </span>
-                                      {category.name}
-                                    </div>
-                                  </SelectItem>
-                                ))}
+                                {data.categories.map((category) => {
+                                  const IconComponent = categoryIcons.find(ci => ci.name === category.icon)?.icon || Star;
+                                  return (
+                                    <SelectItem key={category.id} value={category.id}>
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-3 h-3 rounded-full bg-primary/30 flex items-center justify-center">
+                                          <IconComponent className="h-3 w-3" />
+                                        </span>
+                                        {category.name}
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })}
                               </SelectContent>
                             </Select>
                           </div>
@@ -530,22 +531,22 @@ export default function DashboardPage() {
           </div>
 
           {/* Alertas de categorias acima do limite */}
-          {data.categoriesOverLimit.length > 0 && (
+            {data.categoriesOverLimit.length > 0 && (
             <div className="mt-6 bg-card border border-border rounded-xl p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-foreground mb-4">⚠️ Alertas de Limite</h2>
-              <div className="space-y-3">
-                {data.categoriesOverLimit.map((category, index) => (
-                  <CategoryAlert
-                    key={index}
-                    category={category.name}
-                    spent={category.spent}
-                    limit={category.limit}
-                    isExceeded={category.spent > category.limit}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+                  <div className="space-y-3">
+                    {data.categoriesOverLimit.map((category, index) => (
+                      <CategoryAlert
+                        key={index}
+                        category={category.name}
+                        spent={category.spent}
+                        limit={category.limit}
+                        isExceeded={category.spent > category.limit}
+                      />
+                    ))}
+                  </div>
+                    </div>
+                  )}
         </div>
       </div>
     </AuthGuard>
